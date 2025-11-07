@@ -9,7 +9,7 @@ public class GuardianUdpSender : MonoBehaviour
 {
     [Header("Pi Network")]
     [Tooltip("If your Pi is running as an AP, its IP is often 192.168.4.1. Change if needed.")]
-    public string piIp = "192.168.4.1";
+    public string piIp = "192.168.1.104";
     public int piPort = 33333;
 
     [Header("Send")]
@@ -33,8 +33,18 @@ public class GuardianUdpSender : MonoBehaviour
         sendInterval = 1f / Mathf.Max(1, sendRateHz);
         TryInitControllers();
 
-        udp = new UdpClient();
+        // Bind to your Wi-Fi network's IP before connecting
+        string localIP = "192.168.1.103";  // <-- replace with your actual Wi-Fi IP
+        udp = new UdpClient(new IPEndPoint(IPAddress.Parse(localIP), 0));
         udp.Connect(piIp, piPort);
+
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+                Debug.Log("Local IP: " + ip);
+        }
+
     }
 
     void OnDestroy()
